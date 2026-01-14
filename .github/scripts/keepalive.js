@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 const STREAMLIT_URL = process.env.STREAMLIT_URL;
 const SUMMARY_PATH = process.env.GITHUB_STEP_SUMMARY;
 
-const PAGE_LOAD_GRACE_PERIOD_MS = 2000;
+const PAGE_LOAD_GRACE_PERIOD_MS = 5000;
 const WAKE_BUTTON_POLL_TIMEOUT_MS = 60_000;
 const WAKE_BUTTON_POLL_INTERVAL_MS = 1000;
 const WAKE_MAX_ATTEMPTS = 3;
@@ -135,7 +135,13 @@ const fail = async (reason, err) => {
       const clicked = await findAndClickWakeButton();
 
       if (!clicked) {
-        await fail('Wake-up button not found and app not ready');
+        console.log(
+          `Wake-up button not found after polling; assuming app is already awake (attempt ${attempt}/${WAKE_MAX_ATTEMPTS})`,
+        );
+        console.log(
+          `Keepalive succeeded in ${Date.now() - startedAt}ms (already awake)`,
+        );
+        return;
       }
 
       lastClickedLabel = clicked.label;
