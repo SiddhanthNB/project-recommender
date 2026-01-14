@@ -1,0 +1,26 @@
+name: keepalive-puppeteer
+
+on:
+  schedule:
+    - cron: "0 */8 * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Wake Streamlit
+        env:
+          STREAMLIT_URL: ${{ secrets.STREAMLIT_URL }}
+          GITHUB_STEP_SUMMARY: ${{ env.GITHUB_STEP_SUMMARY }}
+        run: |
+          npm install puppeteer
+          node .github/scripts/keepalive.js
